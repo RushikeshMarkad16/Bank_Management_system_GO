@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	//"Day5/Bank/Accountant"
 )
 
 type customer struct {
@@ -14,11 +13,30 @@ type customer struct {
 	balance    int
 }
 
-func generatePass(account_no int) {
+func create_account(c1 customer) {
+	var phone int
+	fmt.Println("Enter customer's phone no : ")
+	fmt.Scanln(&phone)
+	c1.phone = phone
+	var cust_email string
+	fmt.Println("Enter customer's email : ")
+	fmt.Scanln(&cust_email)
+	c1.cust_email = cust_email
+	account_no := 320156851
+	c1.account_no = account_no
+	//generatePass(account_no)
+
 	c_password := rand.Intn(5000) + account_no
-	fmt.Println("Your account number is : ", account_no)
-	fmt.Println("Your password is : ", c_password)
+	fmt.Println("Account number is : ", account_no)
+	fmt.Println("Password is : ", c_password)
+	c1.c_password = c_password
+	fmt.Println("Struct is : ", c1)
+	account_no++
 }
+
+//func generatePass(account_no int) {
+
+//}
 
 //To login as a accountant or the customer
 func login(acc_email, acc_password string) {
@@ -41,14 +59,26 @@ func login(acc_email, acc_password string) {
 		if a_login_mail == acc_email && a_login_pass == acc_password {
 			fmt.Println("Welcome, Logged in successfully as Accountant")
 
-			var phone int
-			fmt.Println("Enter customer's phone no : ")
-			fmt.Scanln(&phone)
-			var cust_email string
-			fmt.Println("Enter customer's email : ")
-			fmt.Scanln(&cust_email)
-			account_no := 320156851
-			generatePass(account_no)
+			for {
+				fmt.Println("1. Create Account")
+				fmt.Println("2. Delete Account")
+				fmt.Println("3. Exit")
+				var input int
+				fmt.Println("Enter your choice : ")
+				fmt.Scanln(&input)
+
+				switch input {
+				case 1:
+					var c1 customer
+					create_account(c1)
+				case 2:
+					//delete_account()
+					fmt.Println("In delete loop")
+				case 3:
+					break
+
+				}
+			}
 
 		} else {
 			//for incorrect credentials
@@ -71,5 +101,6 @@ func main() {
 	acc_email := "account@bank.com"
 	acc_password := "josh@123"
 	login(acc_email, acc_password)
+	//map1 := map[int]customer{}
 
 }
