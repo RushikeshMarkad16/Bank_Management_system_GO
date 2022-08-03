@@ -3,7 +3,10 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"time"
 )
+
+var account_no int
 
 type customer struct {
 	cust_email string
@@ -13,6 +16,16 @@ type customer struct {
 	balance    int
 	trans_type string
 }
+
+type hist struct {
+	sr_no              int
+	date               string
+	transaction_type   string
+	transaction_amount int
+	total_balance      int
+}
+
+var histo = map[int][]hist{}
 
 var map1 = make(map[int]customer)
 
@@ -35,8 +48,6 @@ func create_account(c1 customer) {
 	c1.c_password = c_password
 	c1.balance = 0
 	map1[account_no] = c1
-	fmt.Println("Struct is : ", c1)
-	fmt.Println("map is : ", map1)
 	account_no++
 }
 
@@ -57,7 +68,7 @@ func cust_login() {
 	temp := map1[cust_id]
 	if cust_id == temp.account_no && cust_pass == temp.c_password {
 		for {
-			fmt.Println("What you want to do 1. Deposit 2. Withdraw 3. View Balance 4. Transaction type 5. Exit")
+			fmt.Println("What you want to do 1. Deposit 2. Withdraw 3. View Balance 4. Delete account 5. Transaction History 6.Exit")
 			fmt.Scanln(&a)
 			flag := false
 			switch a {
@@ -68,6 +79,40 @@ func cust_login() {
 				temp1 := map1[cust_id]
 				temp1.balance += dep
 				map1[cust_id] = temp1
+				transt := "Credit"
+				temp3 := map1[cust_id]
+				temp3.trans_type = transt
+				map1[cust_id] = temp3
+
+				_, ok := histo[temp1.account_no]
+				if ok {
+					var flag int = 0
+					for i := 0; i <= len(histo); i++ {
+						flag++
+					}
+					var a hist
+					t := time.Now()
+					a.date = t.Format("01-02-2006")
+					a.sr_no = flag
+					a.total_balance = temp1.balance
+					a.transaction_amount = dep
+					a.transaction_type = "Deposit"
+					temp3 := histo[cust_id]
+					temp3 = append(temp3, a)
+					histo[cust_id] = temp3
+				} else {
+					var a hist
+					t := time.Now()
+					a.date = t.Format("01-02-2006")
+					a.sr_no = 1
+					a.total_balance = temp1.balance
+					a.transaction_amount = dep
+					a.transaction_type = "Deposit"
+					temp3 := histo[cust_id]
+					temp3 = append(temp3, a)
+					histo[cust_id] = temp3
+				}
+
 			case 2:
 				var withd int
 				fmt.Println("Enter the amount to withdraw")
@@ -75,16 +120,56 @@ func cust_login() {
 				temp2 := map1[cust_id]
 				temp2.balance -= withd
 				map1[cust_id] = temp2
-			case 3:
-				fmt.Println("Your balance is: ", map1[cust_id].balance)
-			case 4:
-				var transt string
-				fmt.Println("Enter the type of transaction as Credit OR Debit")
-				fmt.Scanln(&transt)
+				transt := "Debit"
 				temp3 := map1[cust_id]
 				temp3.trans_type = transt
 				map1[cust_id] = temp3
+				_, ok := histo[temp2.account_no]
+				if ok {
+					var flag int = 0
+					for i := 0; i <= len(histo); i++ {
+						flag++
+					}
+					var a hist
+					t := time.Now()
+					a.date = t.Format("01-02-2006")
+					a.sr_no = flag
+					a.total_balance = temp2.balance
+					a.transaction_amount = withd
+					a.transaction_type = "Withdraw"
+					temp3 := histo[cust_id]
+					temp3 = append(temp3, a)
+					histo[cust_id] = temp3
+				} else {
+					var a hist
+					t := time.Now()
+					a.date = t.Format("01-02-2006")
+					a.sr_no = 1
+					a.total_balance = temp2.balance
+					a.transaction_amount = withd
+					a.transaction_type = "Withdraw"
+					temp3 := histo[cust_id]
+					temp3 = append(temp3, a)
+					histo[cust_id] = temp3
+				}
+
+			case 3:
+				fmt.Println("Your balance is: ", map1[cust_id].balance)
+			/*
+				case 4:
+					var transt string
+					fmt.Println("Enter the type of transaction as Credit OR Debit")
+					fmt.Scanln(&transt)
+					temp3 := map1[cust_id]
+					temp3.trans_type = transt
+					map1[cust_id] = temp3
+			*/
+			case 4:
+				delete(map1, temp.account_no)
+				fmt.Println("Account Successfully Deleted")
 			case 5:
+				transhistory(cust_id)
+			case 6:
 				flag = true
 			}
 			if flag {
@@ -144,6 +229,19 @@ func acc_login() {
 		acc_login()
 	}
 
+}
+
+func transhistory(account_no int) {
+	var make ([]hist) = histo[account_no]
+	fmt.Println("***Transaction History***")
+	for i := 0; i < len(make); i++ {
+		var typ hist = make[i]
+		fmt.Println("Sr no. : ", typ.sr_no)
+		fmt.Println("Date : ", typ.date)
+		fmt.Println("Type of Transaction : ", typ.transaction_type)
+		fmt.Println("Transaction amount : ", typ.transaction_amount)
+		fmt.Println("Total Balance : ", typ.total_balance)
+	}
 }
 
 func main() {
